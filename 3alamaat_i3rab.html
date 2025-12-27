@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول علامات الإعراب المتدرج</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+        :root {
+            --raf-color: #d4edda; /* خلفية الرفع */
+            --raf-dark: #155724;
+            --nasb-color: #d6e9f9; /* خلفية النصب */
+            --nasb-dark: #084298;
+            --jarr-color: #e2d9f3; /* خلفية الجر */
+            --jarr-dark: #4c3b69;
+            --overlay-color: #6c757d; /* لون الغطاء قبل الكشف */
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        h2 {
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+            background-color: #343a40;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* حاوية الجدول لجعلها قابلة للتمرير في الموبايل */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* تمرير ناعم في الآيفون */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate; 
+            border-spacing: 0;
+            min-width: 800px; /* ضمان عدم انضغاط الجدول */
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            border-left: 1px solid #dee2e6;
+            position: relative;
+            height: 60px; /* ارتفاع ثابت للخلية */
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #e9ecef;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* تنسيق الأعمدة */
+        .th-raf { background-color: var(--raf-color); color: var(--raf-dark); }
+        .th-nasb { background-color: var(--nasb-color); color: var(--nasb-dark); }
+        .th-jarr { background-color: var(--jarr-color); color: var(--jarr-dark); }
+
+        /* العمود الأول (العناوين) */
+        td:first-child {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            position: sticky; /* تثبيت العمود الأول عند التمرير */
+            right: 0;
+            z-index: 2;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+        }
+
+        /* الخلايا المخفية (الغطاء) */
+        .cell-content {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .cell-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* الغطاء الذي يحجب الإجابة */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        /* ألوان الأغطية بناء على العمود */
+        .overlay.raf { background-color: #c3e6cb; }
+        .overlay.nasb { background-color: #b6d4fe; }
+        .overlay.jarr { background-color: #d3c5e5; }
+        
+        .overlay:hover {
+            filter: brightness(0.95); /* تأثير بسيط عند المرور */
+        }
+
+        /* عند الكشف، يختفي الغطاء */
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none; /* لمنع النقر عليه بعد الاختفاء */
+            transform: scale(1.1);
+        }
+
+        /* النصوص */
+        .sign { display: block; font-weight: bold; font-size: 1.2rem; margin-bottom: 5px; }
+        .example { font-size: 0.85rem; color: #555; background: rgba(255,255,255,0.6); padding: 3px 8px; border-radius: 4px; }
+
+        /* زر التحكم (التالي) */
+        .controls {
+            padding: 15px;
+            text-align: center;
+            background: #f1f3f5;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-next {
+            background-color: #343a40;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-next:active { transform: scale(0.95); }
+        .btn-reset {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>علامات إعراب الأسماء</h2>
+    
+    <div class="table-responsive">
+        <table id="grammarTable">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">نوع الاسم</th>
+                    <th class="th-raf" style="width: 25%;">الرفع 🟢</th>
+                    <th class="th-nasb" style="width: 25%;">النصب 🔵</th>
+                    <th class="th-jarr" style="width: 25%;">الجر 🟣</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-row="1">
+                    <td>1. المفرد</td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay raf"></div>
+                        <div class="cell-content">
+                            <span class="sign">الضمة</span>
+                            <span class="example">(اجتهدَ الطالبُ)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay nasb"></div>
+                        <div class="cell-content">
+                            <span class="sign">الفتحة</span>
+                            <span class="example">(كافأتُ الطالبَ)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay jarr"></div>
+                        <div class="cell-content">
+                            <span class="sign">الكسرة</span>
+                            <span class="example">(سلمتُ على الطالبِ)</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-row="2">
+                    <td>2. المثنى</td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay raf"></div>
+                        <div class="cell-content">
+                            <span class="sign">الألف</span>
+                            <span class="example">(نجحَ الطالبان)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay nasb"></div>
+                        <div class="cell-content">
+                            <span class="sign">الياء</span>
+                            <span class="example">(كافأتُ الطالبين)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay jarr"></div>
+                        <div class="cell-content">
+                            <span class="sign">الياء</span>
+                            <span class="example">(سلمتُ على الطالبين)</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-row="3">
+                    <td>3. جمع التكسير</td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay raf"></div>
+                        <div class="cell-content">
+                            <span class="sign">الضمة</span>
+                            <span class="example">(حضرَ الرجالُ)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay nasb"></div>
+                        <div class="cell-content">
+                            <span class="sign">الفتحة</span>
+                            <span class="example">(رأيتُ الرجالَ)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay jarr"></div>
+                        <div class="cell-content">
+                            <span class="sign">الكسرة</span>
+                            <span class="example">(مررتُ بالرجالِ)</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-row="4">
+                    <td>4. جمع المؤنث السالم</td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay raf"></div>
+                        <div class="cell-content">
+                            <span class="sign">الضمة</span>
+                            <span class="example">(تفوقتِ الطالباتُ)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay nasb"></div>
+                        <div class="cell-content">
+                            <span class="sign">الكسرة</span>
+                            <span class="example">(شكرتُ الطالباتِ)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay jarr"></div>
+                        <div class="cell-content">
+                            <span class="sign">الكسرة</span>
+                            <span class="example">(سلمتُ على الطالباتِ)</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-row="5">
+                    <td>5. جمع المذكر السالم</td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay raf"></div>
+                        <div class="cell-content">
+                            <span class="sign">الواو</span>
+                            <span class="example">(وصلَ المهندسون)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay nasb"></div>
+                        <div class="cell-content">
+                            <span class="sign">الياء</span>
+                            <span class="example">(رأيتُ المهندسين)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay jarr"></div>
+                        <div class="cell-content">
+                            <span class="sign">الياء</span>
+                            <span class="example">(نظرتُ إلى المهندسين)</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-row="6">
+                    <td>6. الأسماء الخمسة</td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay raf"></div>
+                        <div class="cell-content">
+                            <span class="sign">الواو</span>
+                            <span class="example">(جاءَ أبوك)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay nasb"></div>
+                        <div class="cell-content">
+                            <span class="sign">الألف</span>
+                            <span class="example">(رأيتُ أباك)</span>
+                        </div>
+                    </td>
+                    <td onclick="revealCell(this)">
+                        <div class="overlay jarr"></div>
+                        <div class="cell-content">
+                            <span class="sign">الياء</span>
+                            <span class="example">(سلمتُ على أبيك)</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="controls">
+        <button class="btn-next" onclick="revealNext()">ابدأ العرض (التالي) 👈</button>
+        <button class="btn-reset" onclick="resetTable()">إعادة 🔄</button>
+    </div>
+</div>
+
+<script>
+    // الحصول على جميع الخلايا القابلة للكشف بالترتيب الصحيح (صف بصف)
+    const allCells = document.querySelectorAll('td:not(:first-child)');
+    let currentIndex = 0;
+
+    function revealCell(td) {
+        const overlay = td.querySelector('.overlay');
+        const content = td.querySelector('.cell-content');
+        
+        if (overlay && !overlay.classList.contains('hidden')) {
+            overlay.classList.add('hidden');
+            content.classList.add('visible');
+            
+            // تحديث المؤشر لزر "التالي" ليتخطى هذه الخلية إذا تم كشفها يدوياً
+            // نبحث عن هذه الخلية في القائمة ونضبط المؤشر بعدها
+            for(let i=0; i<allCells.length; i++) {
+                if(allCells[i] === td) {
+                    if (i >= currentIndex) {
+                        currentIndex = i + 1;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    function revealNext() {
+        if (currentIndex < allCells.length) {
+            // محاكاة النقر على الخلية التالية
+            revealCell(allCells[currentIndex]);
+            // التمرير التلقائي للخلية إذا كانت خارج الشاشة (مهم للموبايل)
+            allCells[currentIndex-1].scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+        } else {
+            alert("تم عرض الجدول بالكامل!");
+        }
+    }
+
+    function resetTable() {
+        const overlays = document.querySelectorAll('.overlay');
+        const contents = document.querySelectorAll('.cell-content');
+        
+        overlays.forEach(o => o.classList.remove('hidden'));
+        contents.forEach(c => c.classList.remove('visible'));
+        currentIndex = 0;
+        
+        // العودة لأعلى الجدول
+        document.querySelector('table').scrollIntoView({behavior: "smooth"});
+    }
+</script>
+
+</body>
+</html>
