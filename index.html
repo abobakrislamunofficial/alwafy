@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المكتبة التعليمية</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --vocab-color: #27ae60;
+            --grammar-color: #e67e22;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* ترويسة الصفحة */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; }
+
+        /* تصميم التبويبات */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #777;
+            border-bottom: 4px solid transparent;
+            transition: all 0.3s ease;
+            width: 50%; /* كل تبويب يأخذ نصف الشاشة */
+            max-width: 300px;
+        }
+
+        .tab-btn:hover {
+            background-color: #f1f1f1;
+            color: var(--primary);
+        }
+
+        /* تنسيق التبويب النشط */
+        .tab-btn.active.vocab {
+            color: var(--vocab-color);
+            border-bottom-color: var(--vocab-color);
+        }
+
+        .tab-btn.active.grammar {
+            color: var(--grammar-color);
+            border-bottom-color: var(--grammar-color);
+        }
+
+        /* حاوية البحث */
+        .search-container {
+            text-align: center;
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 0 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            text-align: center;
+            transition: border 0.3s;
+        }
+        .search-input:focus { border-color: var(--primary); }
+
+        /* شبكة العرض */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* البطاقة */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .download-btn {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* ألوان الأزرار حسب النوع */
+        .btn-vocab { background-color: var(--vocab-color); }
+        .btn-grammar { background-color: var(--grammar-color); }
+
+        .btn-vocab:hover { background-color: #219150; }
+        .btn-grammar:hover { background-color: #d35400; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>مكتبة المحتوى التعليمي</h1>
+    </header>
+
+    <div class="tabs-container">
+        <button class="tab-btn active vocab" onclick="switchTab('vocab')">
+            📚 المفردات اللغوية
+        </button>
+        <button class="tab-btn grammar" onclick="switchTab('grammar')">
+            📝 القواعد النحوية
+        </button>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="بحث سريع في القسم الحالي...">
+    </div>
+
+    <div class="content-grid" id="displayArea">
+        </div>
+
+    <script>
+        // --- 1. قاعدة البيانات (يمكنك الإضافة هنا) ---
+        const database = [
+            // قسم المفردات (category: 'vocab')
+            {
+                title: "درس: أفراد الأسرة",
+                category: "vocab",
+                desc: "عرض تقديمي بالصور لأسماء أفراد العائلة.",
+                link: "#"
+            },
+            {
+                title: "درس: في السوق",
+                category: "vocab",
+                desc: "المصطلحات المستخدمة عند البيع والشراء.",
+                link: "#"
+            },
+            {
+                title: "درس: الألوان",
+                category: "vocab",
+                desc: "تعلم الألوان الأساسية والثانوية.",
+                link: "#"
+            },
+
+            // قسم القواعد (category: 'grammar')
+            {
+                title: "قاعدة: الجملة الاسمية",
+                category: "grammar",
+                desc: "شرح المبتدأ والخبر وعلامات الرفع.",
+                link: "#"
+            },
+            {
+                title: "قاعدة: الحروف الناسخة",
+                category: "grammar",
+                desc: "شرح إن وأخواتها وتأثيرها على الجملة.",
+                link: "#"
+            },
+            {
+                title: "قاعدة: الفعل الماضي",
+                category: "grammar",
+                desc: "حالات بناء الفعل الماضي مع الأمثلة.",
+                link: "#"
+            }
+        ];
+
+        // --- 2. المنطق البرمجي للتبويبات ---
+
+        let currentCategory = 'vocab'; // التبويب الافتراضي عند الفتح
+        const displayArea = document.getElementById('displayArea');
+        const searchInput = document.getElementById('searchInput');
+        const tabs = document.querySelectorAll('.tab-btn');
+
+        // دالة تغيير التبويب
+        function switchTab(category) {
+            currentCategory = category;
+
+            // تحديث شكل الأزرار (إزالة وإضافة الـ Active)
+            tabs.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.classList.contains(category)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // تفريغ مربع البحث عند تغيير التبويب (اختياري)
+            searchInput.value = '';
+
+            // إعادة رسم المحتوى
+            renderContent();
+        }
+
+        // دالة عرض المحتوى
+        function renderContent() {
+            displayArea.innerHTML = ''; // مسح المحتوى القديم
+            
+            const searchText = searchInput.value.toLowerCase();
+
+            // 1. تصفية حسب التبويب المختار
+            // 2. تصفية حسب البحث المكتوب
+            const filteredData = database.filter(item => {
+                return item.category === currentCategory && 
+                       (item.title.toLowerCase().includes(searchText) || 
+                        item.desc.toLowerCase().includes(searchText));
+            });
+
+            // إنشاء البطاقات
+            if (filteredData.length === 0) {
+                displayArea.innerHTML = '<p style="text-align:center; width:100%; color:#999;">لا توجد محتويات في هذا القسم حالياً.</p>';
+            } else {
+                filteredData.forEach(item => {
+                    const btnClass = item.category === 'vocab' ? 'btn-vocab' : 'btn-grammar';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <h3>${item.title}</h3>
+                        <p>${item.desc}</p>
+                        <a href="${item.link}" class="download-btn ${btnClass}" target="_blank">فتح العرض</a>
+                    `;
+                    displayArea.appendChild(card);
+                });
+            }
+        }
+
+        // تفعيل البحث المباشر
+        searchInput.addEventListener('input', renderContent);
+
+        // التشغيل لأول مرة
+        renderContent();
+
+    </script>
+</body>
+</html>
