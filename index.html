@@ -7,15 +7,17 @@
     <style>
         :root {
             /* الألوان الرئيسية */
-            --vocab-color: #27ae60; /* أخضر للمفردات */
+            --vocab-color: #27ae60;
             --vocab-hover: #219150;
-            
-            --grammar-color: #2980b9; /* أزرق للقواعد */
+            --grammar-color: #2980b9;
             --grammar-hover: #21618c;
-
             --bg-body: #f4f7f6;
             --text-dark: #34495e;
             --header-bg: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box; /* لضمان حساب المقاسات بدقة */
         }
 
         body {
@@ -42,6 +44,7 @@
             margin: 0;
             font-size: 2rem;
             letter-spacing: 1px;
+            line-height: 1.3;
         }
 
         /* --- حاوية التبويبات --- */
@@ -50,7 +53,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000; /* رفعنا الطبقة لتظهر فوق المحتوى عند التمرير */
         }
 
         .tabs-container {
@@ -70,6 +73,7 @@
             transition: all 0.3s ease;
             opacity: 0.6;
             color: #7f8c8d;
+            white-space: nowrap; /* لمنع نزول النص لسطرين */
         }
 
         .tab-btn:hover {
@@ -77,26 +81,17 @@
             background-color: #f8f9fa;
         }
 
-        /* المفردات (أخضر) */
-        .tab-btn.vocab.active {
-            opacity: 1;
-            color: white;
-            background-color: var(--vocab-color);
-        }
+        /* تنسيقات التفعيل */
+        .tab-btn.vocab.active { opacity: 1; color: white; background-color: var(--vocab-color); }
         .tab-btn.vocab { border-bottom: 5px solid var(--vocab-color); }
 
-        /* القواعد (أزرق) */
-        .tab-btn.grammar.active {
-            opacity: 1;
-            color: white;
-            background-color: var(--grammar-color);
-        }
+        .tab-btn.grammar.active { opacity: 1; color: white; background-color: var(--grammar-color); }
         .tab-btn.grammar { border-bottom: 5px solid var(--grammar-color); }
 
         /* --- مربع البحث --- */
         .search-area {
             text-align: center;
-            margin: 30px 20px;
+            margin: 30px 20px 10px 20px;
         }
 
         .search-input {
@@ -109,6 +104,7 @@
             outline: none;
             text-align: center;
             transition: 0.3s;
+            -webkit-appearance: none; /* لتحسين المظهر على iOS */
         }
 
         .search-input:focus {
@@ -119,11 +115,13 @@
         /* --- شبكة المحتوى --- */
         .content-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            /* تم تعديل minmax ليكون 280 بكسل ليناسب الهواتف */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
             padding: 20px;
             max-width: 1100px;
-            margin: 0 auto 50px auto;
+            margin: 0 auto 30px auto;
+            width: 100%;
             flex-grow: 1;
         }
 
@@ -167,6 +165,7 @@
             text-decoration: none;
             font-weight: bold;
             transition: background 0.3s;
+            margin-top: auto; /* لدفع الزر للأسفل دائماً */
         }
 
         .card-btn.vocab-btn { background-color: var(--vocab-color); }
@@ -175,18 +174,17 @@
         .card-btn.grammar-btn { background-color: var(--grammar-color); }
         .card-btn.grammar-btn:hover { background-color: var(--grammar-hover); }
 
-        /* رسائل التنبيه */
         .alert-msg {
             grid-column: 1 / -1;
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
             background: white;
             border-radius: 10px;
             color: #7f8c8d;
             font-size: 1.1rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        
+
         footer {
             text-align: center;
             padding: 20px;
@@ -196,6 +194,35 @@
             margin-top: auto;
         }
 
+        /* =========================================
+           تحسينات التجاوب (Mobile Responsiveness)
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            header { padding: 1.5rem 1rem; }
+            header h1 { font-size: 1.5rem; }
+            
+            .tab-btn {
+                padding: 15px 10px;
+                font-size: 1rem;
+            }
+
+            .content-grid {
+                padding: 15px;
+                gap: 15px;
+                /* تقليل عرض العمود ليناسب الهواتف الضيقة */
+                grid-template-columns: 1fr; 
+            }
+            
+            .card { padding: 20px; }
+            .search-area { margin-top: 20px; }
+        }
+
+        @media screen and (min-width: 480px) and (max-width: 768px) {
+            /* للأجهزة اللوحية الصغيرة والهواتف الكبيرة */
+            .content-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
@@ -228,7 +255,6 @@
 
     <script>
         // ================= إعدادات الروابط =================
-        // هذا هو العنوان الأساسي لمستودعك، سيتم إضافته قبل كل اسم ملف لضمان عمل الرابط
         const baseUrl = "https://abobakrislamunofficial.github.io/alwafy/";
 
         const lessons = [
@@ -252,12 +278,12 @@
                 fileName: "af3al_nasikha.html"
             }
             
-            // --- قسم المفردات (فارغ) ---
+            // --- قسم المفردات ---
+            // أضف الدروس هنا مستقبلاً
         ];
 
         // ================= المنطق البرمجي =================
-
-        let activeTab = 'grammar'; // البدء بالقواعد لأنها تحتوي على بيانات
+        let activeTab = 'grammar'; 
         
         const contentArea = document.getElementById('contentArea');
         const searchInput = document.getElementById('searchInput');
@@ -265,16 +291,12 @@
 
         function setTab(category) {
             activeTab = category;
-            
-            // تحديث شكل الأزرار
             btns.forEach(btn => {
                 btn.classList.remove('active');
                 if(btn.classList.contains(category)) {
                     btn.classList.add('active');
                 }
             });
-
-            // تفريغ مربع البحث
             searchInput.value = ''; 
             render();
         }
@@ -283,7 +305,6 @@
             contentArea.innerHTML = '';
             const query = searchInput.value.toLowerCase();
 
-            // تصفية المحتوى
             const filtered = lessons.filter(item => {
                 const isSameCategory = item.category === activeTab;
                 const matchesSearch = item.title.toLowerCase().includes(query) || 
@@ -291,11 +312,8 @@
                 return isSameCategory && matchesSearch;
             });
 
-            // حالة عدم وجود نتائج
             if (filtered.length === 0) {
-                // فحص هل القسم فارغ تماماً أم أن البحث لم يجد نتيجة
                 const isCategoryEmpty = !lessons.some(l => l.category === activeTab);
-                
                 if (isCategoryEmpty) {
                     contentArea.innerHTML = `
                         <div class="alert-msg">
@@ -308,13 +326,10 @@
                 return;
             }
 
-            // بناء البطاقات
             filtered.forEach(lesson => {
                 const cardClass = lesson.category === 'vocab' ? 'vocab-card' : 'grammar-card';
                 const btnClass = lesson.category === 'vocab' ? 'vocab-btn' : 'grammar-btn';
                 const btnText = lesson.category === 'vocab' ? 'عرض الدرس' : 'فتح الشرح';
-
-                // دمج الرابط الأساسي مع اسم الملف
                 const fullLink = baseUrl + lesson.fileName;
 
                 const div = document.createElement('div');
@@ -330,10 +345,7 @@
             });
         }
 
-        // الاستماع للكتابة في مربع البحث
         searchInput.addEventListener('input', render);
-
-        // التشغيل الأولي
         render();
 
     </script>
