@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المبتدأ والخبر - عرض شامل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdfbf7;
+            --text-color: #37474f;
+            --header-color: #263238;
+            
+            /* ألوان علامات الإعراب */
+            --damma-color: #1565c0;   /* أزرق */
+            --alif-color: #2e7d32;    /* أخضر */
+            --waw-color: #e65100;     /* برتقالي */
+            
+            /* UI Elements */
+            --box-bg: #fff;
+            --btn-bg: #fff;
+            --btn-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            --btn-hover: #37474f;
+        }
+
+        /* Responsive Base Font Size */
+        html { font-size: 2vh; }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #presentation-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Slide Structure --- */
+        .slide {
+            position: absolute;
+            width: 85%;
+            max-width: 1200px;
+            height: auto;
+            max-height: 90vh;
+            opacity: 0;
+            transform: translateY(2rem);
+            transition: all 0.5s ease;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .slide-header {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: var(--header-color);
+            border-bottom: 4px solid #eee;
+            padding-bottom: 0.5rem;
+            width: fit-content;
+        }
+
+        .content-scroll-area {
+            width: 100%;
+            overflow-y: auto;
+            padding-right: 1rem;
+            padding-bottom: 6rem; /* Space for buttons */
+            max-height: 75vh;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+
+        /* --- Animations & Steps --- */
+        .step {
+            opacity: 0;
+            transform: translateY(1.5rem);
+            transition: all 0.4s ease-out;
+            margin-bottom: 1.5rem;
+        }
+        .step.visible { opacity: 1; transform: translateY(0); }
+
+        /* Witness Points (Interactive Words) */
+        .word-target {
+            display: inline-block;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            padding: 0 2px;
+            cursor: pointer;
+        }
+        
+        .word-target.active-damma { color: var(--damma-color); font-weight: 900; border-bottom-color: var(--damma-color); }
+        .word-target.active-alif { color: var(--alif-color); font-weight: 900; border-bottom-color: var(--alif-color); }
+        .word-target.active-waw { color: var(--waw-color); font-weight: 900; border-bottom-color: var(--waw-color); }
+
+        /* --- Components --- */
+        .rule-box {
+            background: #eceff1;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border-right: 6px solid var(--header-color);
+            font-size: 1.8rem;
+            line-height: 1.7;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+        }
+
+        .example-row {
+            background: var(--box-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sentence-text {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        .analysis-box {
+            font-size: 1.6rem;
+            background: #fafafa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: #555;
+            border-right: 4px solid #ccc;
+            display: block;
+            width: fit-content;
+        }
+        
+        .analysis-box.damma { border-color: var(--damma-color); color: var(--damma-color); background: #e3f2fd; }
+        .analysis-box.alif { border-color: var(--alif-color); color: var(--alif-color); background: #e8f5e9; }
+        .analysis-box.waw { border-color: var(--waw-color); color: var(--waw-color); background: #fff3e0; }
+
+        /* Section Separators */
+        .section-separator {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 2rem 0 1rem 0;
+            color: var(--header-color);
+            border-bottom: 2px dashed #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        /* --- Training --- */
+        .training-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .training-text { font-size: 2rem; font-weight: 600; flex: 1.5; min-width: 250px; }
+        .training-answer {
+            font-size: 1.6rem;
+            background-color: #546e7a;
+            color: #fff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        /* Intro Screen */
+        .intro-title { font-size: 5rem; font-weight: 900; color: var(--header-color); margin: 0; }
+        .intro-subtitle { font-size: 2rem; color: #78909c; margin-top: 1rem; }
+
+        /* Navigation */
+        .nav-controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: var(--btn-bg);
+            border: 1px solid #cfd8dc;
+            padding: 0.8rem 3rem;
+            border-radius: 2rem;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: var(--btn-shadow);
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+        .nav-btn:hover { background: var(--btn-hover); color: #fff; transform: translateY(-2px); }
+        .nav-btn:active { transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div id="presentation-area">
+
+        <div class="slide active" style="align-items: center; justify-content: center; text-align: center;">
+            <div class="intro-title">المبتدأ والخبر</div>
+            <div class="step visible intro-subtitle">الجملة الاسمية وأركانها</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">المبتدأ والخبر</div>
+            <div class="content-scroll-area">
+                <div class="step rule-box">
+                    <strong>التعريف:</strong><br>
+                    تتكون الجملة الاسمية من ركنين أساسيين هما: المبتدأ والخبر.
+                </div>
+                <div class="step rule-box">
+                    <strong>إعراب المبتدأ والخبر:</strong><br>
+                    مرفوعان. وتختلف علامة الرفع باختلاف نوع الكلمة (الضمة، الألف، الواو).
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">علامة الرفع: الضمة</div>
+            <div class="content-scroll-area">
+                <div class="step rule-box" style="border-right-color: var(--damma-color);">
+                    <strong>القاعدة:</strong> تكون علامة الرفع الضمة في ثلاثة مواضع: (المفرد، جمع التكسير، جمع المؤنث السالم).
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--damma-color);">1. المفرد:</strong>
+                    <div class="sentence-text">
+                        <span class="word-target" data-type="active-damma">العلمُ</span>
+                        <span class="word-target" data-type="active-damma">نورٌ</span>.
+                    </div>
+                    <div class="step analysis-box damma">
+                        <strong>العلم:</strong> مبتدأ مرفوع وعلامة رفعه الضمة.<br>
+                        <strong>نور:</strong> خبر مرفوع وعلامة رفعه الضمة.
+                    </div>
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--damma-color);">2. جمع التكسير:</strong>
+                    <div class="sentence-text">
+                        <span class="word-target" data-type="active-damma">الجنودُ</span>
+                        <span class="word-target" data-type="active-damma">شجعانٌ</span>.
+                    </div>
+                    <div class="step analysis-box damma">
+                        <strong>الجنود:</strong> مبتدأ مرفوع وعلامة رفعه الضمة.<br>
+                        <strong>شجعان:</strong> خبر مرفوع وعلامة رفعه الضمة.
+                    </div>
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--damma-color);">3. جمع المؤنث السالم:</strong>
+                    <div class="sentence-text">
+                        <span class="word-target" data-type="active-damma">الممرضاتُ</span>
+                        <span class="word-target" data-type="active-damma">رحيماتٌ</span>.
+                    </div>
+                    <div class="step analysis-box damma">
+                        <strong>الممرضات:</strong> مبتدأ مرفوع وعلامة رفعه الضمة.<br>
+                        <strong>رحيمات:</strong> خبر مرفوع وعلامة رفعه الضمة.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">علامة الرفع: الألف</div>
+            <div class="content-scroll-area">
+                <div class="step rule-box" style="border-right-color: var(--alif-color);">
+                    <strong>القاعدة:</strong> تكون علامة الرفع الألف إذا كان الاسم مثنى.
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--alif-color);">1. المثنى المذكر:</strong>
+                    <div class="sentence-text">
+                        <span class="word-target" data-type="active-alif">المهندسانِ</span>
+                        <span class="word-target" data-type="active-alif">بارعانِ</span>.
+                    </div>
+                    <div class="step analysis-box alif">
+                        <strong>المهندسان:</strong> مبتدأ مرفوع وعلامة رفعه الألف لأنه مثنى.<br>
+                        <strong>بارعان:</strong> خبر مرفوع وعلامة رفعه الألف لأنه مثنى.
+                    </div>
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--alif-color);">2. المثنى المؤنث:</strong>
+                    <div class="sentence-text">
+                        <span class="word-target" data-type="active-alif">القصتانِ</span>
+                        <span class="word-target" data-type="active-alif">مفيدتانِ</span>.
+                    </div>
+                    <div class="step analysis-box alif">
+                        <strong>القصتان:</strong> مبتدأ مرفوع وعلامة رفعه الألف لأنه مثنى.<br>
+                        <strong>مفيدتان:</strong> خبر مرفوع وعلامة رفعه الألف لأنه مثنى.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">علامة الرفع: الواو</div>
+            <div class="content-scroll-area">
+                <div class="step rule-box" style="border-right-color: var(--waw-color);">
+                    <strong>القاعدة:</strong> تكون علامة الرفع الواو في موضعين: (جمع المذكر السالم، والأسماء الخمسة).
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--waw-color);">1. جمع المذكر السالم:</strong>
+                    <div class="sentence-text">
+                        <span class="word-target" data-type="active-waw">المعلمونَ</span>
+                        <span class="word-target" data-type="active-waw">مخلصونَ</span>.
+                    </div>
+                    <div class="step analysis-box waw">
+                        <strong>المعلمون:</strong> مبتدأ مرفوع وعلامة رفعه الواو لأنه جمع مذكر سالم.<br>
+                        <strong>مخلصون:</strong> خبر مرفوع وعلامة رفعه الواو لأنه جمع مذكر سالم.
+                    </div>
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--waw-color);">2. الأسماء الخمسة (مبتدأ):</strong>
+                    <div class="sentence-text">
+                        <span class="word-target" data-type="active-waw">أبو</span>كَ
+                        رجلٌ طيبٌ.
+                    </div>
+                    <div class="step analysis-box waw">
+                        <strong>أبوك:</strong> مبتدأ مرفوع وعلامة رفعه الواو لأنه من الأسماء الخمسة.
+                    </div>
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--waw-color);">3. الأسماء الخمسة (خبر):</strong>
+                    <div class="sentence-text">
+                        محمدٌ
+                        <span class="word-target" data-type="active-waw">ذو</span>
+                        خُلُقٍ.
+                    </div>
+                    <div class="step analysis-box waw">
+                        <strong>ذو:</strong> خبر مرفوع وعلامة رفعه الواو لأنه من الأسماء الخمسة.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">التدريب</div>
+            <div class="content-scroll-area">
+                
+                <div class="step section-separator">أولاً: حدد المبتدأ وعلامة إعرابه</div>
+
+                <div class="step training-row">
+                    <div class="training-text">1. <span class="word-target" data-type="active-damma">السماءُ</span> صافيةٌ.</div>
+                    <div class="step training-answer">مبتدأ مرفوع بالضمة</div>
+                </div>
+
+                <div class="step training-row">
+                    <div class="training-text">2. <span class="word-target" data-type="active-waw">أخو</span>كَ متفوقٌ.</div>
+                    <div class="step training-answer">مبتدأ مرفوع بالواو - أسماء خمسة</div>
+                </div>
+
+                <div class="step training-row">
+                    <div class="training-text">3. <span class="word-target" data-type="active-damma">الطلابُ</span> في الفصلِ.</div>
+                    <div class="step training-answer">مبتدأ مرفوع بالضمة - جمع تكسير</div>
+                </div>
+
+                <div class="step section-separator">ثانياً: حدد الخبر وعلامة إعرابه</div>
+
+                <div class="step training-row">
+                    <div class="training-text">1. اللاعبانِ <span class="word-target" data-type="active-alif">سريعانِ</span>.</div>
+                    <div class="step training-answer">خبر مرفوع بالألف - مثنى</div>
+                </div>
+
+                <div class="step training-row">
+                    <div class="training-text">2. المهندسونَ <span class="word-target" data-type="active-waw">بارعونَ</span>.</div>
+                    <div class="step training-answer">خبر مرفوع بالواو - جمع مذكر سالم</div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevStep()">السابق</button>
+        <button class="nav-btn" onclick="nextStep()">التالي</button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function nextStep() {
+            const currentSlide = slides[currentSlideIndex];
+            
+            // Logic: Reveal steps first, then activate words inside steps
+            // Collect all potential interactives
+            const allInteractives = currentSlide.querySelectorAll('.step, .word-target');
+            let targetElement = null;
+
+            for (let el of allInteractives) {
+                // If it's a hidden step, it's a target
+                if (el.classList.contains('step') && !el.classList.contains('visible')) {
+                    targetElement = el;
+                    break;
+                }
+                // If it's a word target inside a visible step, and not yet active
+                if (el.classList.contains('word-target')) {
+                    const dataType = el.getAttribute('data-type');
+                    if (!el.classList.contains(dataType)) {
+                        const parentStep = el.closest('.step');
+                        if (parentStep && parentStep.classList.contains('visible')) {
+                            targetElement = el;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (targetElement) {
+                if (targetElement.classList.contains('step')) {
+                    targetElement.classList.add('visible');
+                    // Auto scroll
+                    setTimeout(() => {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                } else if (targetElement.classList.contains('word-target')) {
+                    const type = targetElement.getAttribute('data-type');
+                    targetElement.classList.add(type);
+                }
+            } else {
+                if (currentSlideIndex < slides.length - 1) {
+                    currentSlide.classList.remove('active');
+                    setTimeout(() => {
+                        currentSlideIndex++;
+                        const nextSlide = slides[currentSlideIndex];
+                        nextSlide.classList.add('active');
+                    }, 400); 
+                }
+            }
+        }
+
+        function prevStep() {
+            const currentSlide = slides[currentSlideIndex];
+            // Reverse search
+            const allInteractives = Array.from(currentSlide.querySelectorAll('.step.visible, .word-target')).reverse();
+            let targetElement = null;
+
+            for (let el of allInteractives) {
+                if (el.classList.contains('word-target')) {
+                    const type = el.getAttribute('data-type');
+                    if (el.classList.contains(type)) {
+                        targetElement = el;
+                        break;
+                    }
+                } else if (el.classList.contains('step')) {
+                    targetElement = el;
+                    break;
+                }
+            }
+
+            if (targetElement) {
+                if (targetElement.classList.contains('step')) {
+                    targetElement.classList.remove('visible');
+                } else if (targetElement.classList.contains('word-target')) {
+                    const type = targetElement.getAttribute('data-type');
+                    targetElement.classList.remove(type);
+                }
+            } else {
+                if (currentSlideIndex > 0) {
+                    currentSlide.classList.remove('active');
+                    setTimeout(() => {
+                        currentSlideIndex--;
+                        const prevSlide = slides[currentSlideIndex];
+                        prevSlide.classList.add('active');
+                        // Show all steps on return
+                        const steps = prevSlide.querySelectorAll('.step');
+                        steps.forEach(s => s.classList.add('visible'));
+                    }, 400);
+                }
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (['Space', 'ArrowLeft', 'ArrowDown'].includes(e.code)) {
+                nextStep();
+            } else if (['ArrowRight', 'ArrowUp'].includes(e.code)) {
+                prevStep();
+            }
+        });
+    </script>
+</body>
+</html>
