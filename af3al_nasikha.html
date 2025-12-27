@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأفعال الناسخة - كان وأخواتها</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdfbf7;
+            --text-color: #37474f;
+            --header-color: #263238;
+            
+            /* ألوان علامات الإعراب */
+            --damma-color: #1565c0;   /* أزرق - للرفع */
+            --fatha-color: #d32f2f;   /* أحمر - للنصب (جديد) */
+            --ya-color: #7b1fa2;      /* بنفسجي - للياء (جديد) */
+            --waw-color: #e65100;     /* برتقالي - للرفع */
+            
+            /* UI Elements */
+            --box-bg: #fff;
+            --btn-bg: #fff;
+            --btn-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            --btn-hover: #37474f;
+        }
+
+        /* Responsive Base Font Size */
+        html { font-size: 2vh; }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #presentation-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Slide Structure --- */
+        .slide {
+            position: absolute;
+            width: 85%;
+            max-width: 1200px;
+            height: auto;
+            max-height: 90vh;
+            opacity: 0;
+            transform: translateY(2rem);
+            transition: all 0.5s ease;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .slide-header {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: var(--header-color);
+            border-bottom: 4px solid #eee;
+            padding-bottom: 0.5rem;
+            width: fit-content;
+        }
+
+        .content-scroll-area {
+            width: 100%;
+            overflow-y: auto;
+            padding-right: 1rem;
+            padding-bottom: 6rem; /* Space for buttons */
+            max-height: 75vh;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+
+        /* --- Animations & Steps --- */
+        .step {
+            opacity: 0;
+            transform: translateY(1.5rem);
+            transition: all 0.4s ease-out;
+            margin-bottom: 1.5rem;
+        }
+        .step.visible { opacity: 1; transform: translateY(0); }
+
+        /* Witness Points (Interactive Words) */
+        .word-target {
+            display: inline-block;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            padding: 0 2px;
+            cursor: pointer;
+        }
+        
+        .word-target.active-damma { color: var(--damma-color); font-weight: 900; border-bottom-color: var(--damma-color); }
+        .word-target.active-fatha { color: var(--fatha-color); font-weight: 900; border-bottom-color: var(--fatha-color); }
+        .word-target.active-ya { color: var(--ya-color); font-weight: 900; border-bottom-color: var(--ya-color); }
+        .word-target.active-waw { color: var(--waw-color); font-weight: 900; border-bottom-color: var(--waw-color); }
+
+        /* --- Components --- */
+        .rule-box {
+            background: #eceff1;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border-right: 6px solid var(--header-color);
+            font-size: 1.8rem;
+            line-height: 1.7;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+        }
+
+        .example-row {
+            background: var(--box-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sentence-text {
+            font-size: 2.2rem;
+            font-weight: 600;
+            font-family: 'Amiri', serif; /* For Quran/Arabic text aesthetic */
+        }
+
+        .analysis-box {
+            font-size: 1.6rem;
+            background: #fafafa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: #555;
+            border-right: 4px solid #ccc;
+            display: block;
+            width: fit-content;
+        }
+        
+        .analysis-box.damma { border-color: var(--damma-color); color: var(--damma-color); background: #e3f2fd; }
+        .analysis-box.fatha { border-color: var(--fatha-color); color: var(--fatha-color); background: #ffebee; }
+        .analysis-box.ya { border-color: var(--ya-color); color: var(--ya-color); background: #f3e5f5; }
+        .analysis-box.waw { border-color: var(--waw-color); color: var(--waw-color); background: #fff3e0; }
+
+        /* Section Separators */
+        .section-separator {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 2rem 0 1rem 0;
+            color: var(--header-color);
+            border-bottom: 2px dashed #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        /* --- Training --- */
+        .training-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .training-text { font-size: 2rem; font-weight: 600; flex: 1.5; min-width: 250px; font-family: 'Amiri', serif; }
+        .training-answer {
+            font-size: 1.6rem;
+            background-color: #546e7a;
+            color: #fff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        /* Intro Screen */
+        .intro-title { font-size: 5rem; font-weight: 900; color: var(--header-color); margin: 0; }
+        .intro-subtitle { font-size: 2rem; color: #78909c; margin-top: 1rem; }
+
+        /* Navigation */
+        .nav-controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: var(--btn-bg);
+            border: 1px solid #cfd8dc;
+            padding: 0.8rem 3rem;
+            border-radius: 2rem;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: var(--btn-shadow);
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+        .nav-btn:hover { background: var(--btn-hover); color: #fff; transform: translateY(-2px); }
+        .nav-btn:active { transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div id="presentation-area">
+
+        <div class="slide active" style="align-items: center; justify-content: center; text-align: center;">
+            <div class="intro-title">الأفعال الناسخة</div>
+            <div class="step visible intro-subtitle">كان وأخواتها</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">القاعدة</div>
+            <div class="content-scroll-area">
+                <div class="step rule-box">
+                    <strong>التعريف:</strong><br>
+                    كان وأخواتها أفعال ناسخة، تدخل على الجملة الاسمية.
+                </div>
+                <div class="step rule-box" style="border-right-color: var(--fatha-color);">
+                    <strong>العمل الإعرابي:</strong><br>
+                    1. ترفع المبتدأ <span style="color:var(--damma-color)">اسماً لها</span>.<br>
+                    2. وتنصب الخبر <span style="color:var(--fatha-color)">خبراً لها</span>.
+                </div>
+                 <div class="step rule-box">
+                    <strong>معاني الأفعال:</strong><br>
+                    كان (الزمن الماضي)، أصبح (الصباح)، أضحى (الضحى)، ظل (النهار)، أمسى (المساء)، بات (البيات)، صار (التحول)، ليس (النفي)، ما دام (الدوام)، ما زال/برح (الاستمرار).
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">الأمثلة:</div>
+            <div class="content-scroll-area">
+                <div class="step rule-box">
+                    <strong>لاحظ:</strong> المبتدأ يبقى مرفوعاً، والخبر يصبح منصوباً.
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--damma-color);">1. </strong>
+                    <div class="sentence-text">
+                        الرجلُ نائمٌ ⬅
+                        كانَ <span class="word-target" data-type="active-damma">الرجلُ</span>
+                        <span class="word-target" data-type="active-fatha">نائماً</span>.
+                    </div>
+                    <div class="step analysis-box damma">
+                        <strong>الرجل:</strong> اسم كان مرفوع بالضمة.
+                    </div>
+                    <div class="step analysis-box fatha">
+                        <strong>نائماً:</strong> خبر كان منصوب بالفتحة.
+                    </div>
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--damma-color);">2. </strong>
+                    <div class="sentence-text">
+                        العنبُ حلوٌ ⬅
+                        صارَ <span class="word-target" data-type="active-damma">العنبُ</span>
+                        <span class="word-target" data-type="active-fatha">حلواً</span>.
+                    </div>
+                </div>
+
+                <div class="step example-row">
+                    <strong style="color:var(--damma-color);">3. </strong>
+                    <div class="sentence-text">
+                         الأشجارُ مثمرةٌ ⬅
+                        صارت <span class="word-target" data-type="active-damma">الأشجارُ</span>
+                        <span class="word-target" data-type="active-fatha">مثمرةً</span>.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">الأمثلة: </div>
+            
+<div class="step example-row">
+    <strong style="color:var(--waw-color);">4. </strong>
+    <div class="sentence-text">
+        ﴿لَن نَبْرَحَ عَلَيْهِ <span class="word-target" data-type="active-ya">عَاكِفِينَ</span>﴾
+    </div>
+    <div class="step analysis-box ya">
+        <strong>عاكفين:</strong> خبر نبرح منصوب وعلامة نصبه الياء لأنه جمع مذكر سالم.
+    </div>
+</div>
+                <div class="step example-row">
+    <strong style="color:var(--waw-color);">5. </strong>
+    <div class="sentence-text">
+        ما زال <span class="word-target" data-type="active-waw">المسلمون</span>
+        <span class="word-target" data-type="active-ya">موحدين</span>.
+    </div>
+    <div class="step analysis-box waw">
+        <strong>المسلمون:</strong> اسم ما زال مرفوع بالواو، لأنه جمع مذكر سالم
+    </div>
+    <div class="step analysis-box ya">
+        <strong>موحدين:</strong> خبر ما زال منصوب بالياء، لأنه جمع مذكر سالم
+    </div>
+</div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">تدريب (1): عين الاسم والخبر</div>
+            <div class="content-scroll-area">
+                
+                <div class="step section-separator">حدد اسم الناسخ وخبره</div>
+
+                <div class="step training-row">
+                    <div class="training-text">1. ﴿ظَلَّ <span class="word-target" data-type="active-damma">وَجْهُهُ</span> <span class="word-target" data-type="active-fatha">مُسْوَدًّا</span>﴾</div>
+                    <div class="step training-answer">اسم: وجهه (ضمة) | خبر: مسوداً (فتحة)</div>
+                </div>
+
+                <div class="step training-row">
+                    <div class="training-text">2. ﴿وَمَا كَانَ <span class="word-target" data-type="active-damma">عَطَاءُ</span> رَبِّكَ <span class="word-target" data-type="active-fatha">مَحْظُورًا</span>﴾</div>
+                    <div class="step training-answer">اسم: عطاءُ (ضمة) | خبر: محظوراً (فتحة)</div>
+                </div>
+
+             <div class="step training-row">
+                    <div class="training-text">3. ﴿فَأَصْبَحْـ<span class="word-target" data-type="active-damma">تُـم</span> بِنِعْمَتِهِ <span class="word-target" data-type="active-fatha">إِخْوَانًا</span>﴾</div>
+                    <div class="step training-answer">اسم: الضمير (تُم) | خبر: إخواناً (فتحة)</div>
+                </div>
+
+                <div class="step training-row">
+                    <div class="training-text">4. أضحى <span class="word-target" data-type="active-damma">القومُ</span> <span class="word-target" data-type="active-ya">مسافرين</span>.</div>
+                    <div class="step training-answer">اسم: القوم (ضمة) | خبر: مسافرين (ياء)</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">تدريب (2) و (3):</div>
+            <div class="content-scroll-area">
+                
+                <div class="step section-separator">أدخل (كان) أو أخواتها وغير ما يلزم:</div>
+
+                <div class="step training-row">
+                    <div class="training-text">الحجاجُ قادمون.</div>
+                    <div class="step training-answer">أمسى الحجاجُ <span style="color:var(--ya-color)">قادمين</span>.</div>
+                </div>
+
+                <div class="step training-row">
+                    <div class="training-text">أبوك سريعُ المشي.</div>
+                    <div class="step training-answer">كان أبوك <span style="color:var(--fatha-color)">سريعَ</span> المشي.</div>
+                </div>
+
+                <div class="step section-separator">احذف الناسخ واضبط الجملة:</div>
+
+                <div class="step training-row">
+                    <div class="training-text">ما زال العدوُّ ناقماً.</div>
+                    <div class="step training-answer">العدوُّ <span style="color:var(--damma-color)">ناقمٌ</span>.</div>
+                </div>
+
+                <div class="step training-row">
+                    <div class="training-text">ليس الجنودُ مستعدين.</div>
+                    <div class="step training-answer">الجنودُ <span style="color:var(--waw-color)">مستعدون</span>.</div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">السابق</button>
+        <button class="nav-btn" onclick="nextSlide()">التالي</button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        // التنقل بين الشرائح فقط (عبر الأزرار)
+        function nextSlide() {
+            if (currentSlideIndex < slides.length - 1) {
+                slides[currentSlideIndex].classList.remove('active');
+                currentSlideIndex++;
+                slides[currentSlideIndex].classList.add('active');
+                // إعادة السكرول للأعلى عند الانتقال
+                const scrollArea = slides[currentSlideIndex].querySelector('.content-scroll-area');
+                if(scrollArea) scrollArea.scrollTop = 0;
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                slides[currentSlideIndex].classList.remove('active');
+                currentSlideIndex--;
+                slides[currentSlideIndex].classList.add('active');
+            }
+        }
+
+        // الإفصاح التدريجي (عند النقر بالماوس)
+        document.addEventListener('click', (e) => {
+            // تجاهل النقر على أزرار التنقل
+            if (e.target.closest('.nav-btn')) return;
+
+            // التعامل مع الكلمات التفاعلية (Word Targets)
+            if (e.target.classList.contains('word-target')) {
+                const type = e.target.getAttribute('data-type');
+                e.target.classList.toggle(type);
+                return; // عدم كشف خطوة جديدة عند النقر على كلمة تفاعلية
+            }
+
+            // التعامل مع كشف الخطوات المخفية
+            const currentSlide = slides[currentSlideIndex];
+            const hiddenStep = currentSlide.querySelector('.step:not(.visible)');
+            
+            if (hiddenStep) {
+                hiddenStep.classList.add('visible');
+                // تمرير ناعم لرؤية العنصر الجديد
+                setTimeout(() => {
+                    hiddenStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        });
+
+        // دعم لوحة المفاتيح للتنقل بين الشرائح فقط
+        document.addEventListener('keydown', (e) => {
+            if (['ArrowLeft', 'ArrowDown'].includes(e.code)) {
+                nextSlide();
+            } else if (['ArrowRight', 'ArrowUp'].includes(e.code)) {
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>
