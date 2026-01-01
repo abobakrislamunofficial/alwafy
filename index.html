@@ -228,10 +228,10 @@
 
     <div class="tabs-wrapper">
         <div class="tabs-container">
-            <button class="tab-btn vocab active" onclick="setTab('vocab')">
+            <button class="tab-btn vocab" onclick="setTab('vocab')">
                 المفردات اللغوية
             </button>
-            <button class="tab-btn grammar" onclick="setTab('grammar')">
+            <button class="tab-btn grammar active" onclick="setTab('grammar')">
                 القواعد النحوية
             </button>
         </div>
@@ -279,11 +279,18 @@
                 category: "grammar",
                 description: "شرح عمل كان وأخواتها عند دخولها على الجملة الاسمية.",
                 fileName: "af3al_nasikha.html"
+            },
+            // --- تمت إضافة الدرس الجديد هنا ---
+            {
+                title: "الحروف الناسخة (إن وأخواتها)",
+                category: "grammar",
+                description: "شرح عمل الحروف الناسخة وتأثيرها في نصب المبتدأ ورفع الخبر.",
+                fileName: "7oroof_naasikha.html"
             }
         ];
 
         // ================= المنطق البرمجي =================
-        let activeTab = 'vocab'; // جعلت الافتراضي مفردات لرؤية الإضافة الجديدة
+        let activeTab = 'grammar'; // البدء بالقواعد
         
         const contentArea = document.getElementById('contentArea');
         const searchInput = document.getElementById('searchInput');
