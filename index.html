@@ -17,7 +17,7 @@
         }
 
         * {
-            box-sizing: border-box; /* لضمان حساب المقاسات بدقة */
+            box-sizing: border-box;
         }
 
         body {
@@ -53,7 +53,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
-            z-index: 1000; /* رفعنا الطبقة لتظهر فوق المحتوى عند التمرير */
+            z-index: 1000;
         }
 
         .tabs-container {
@@ -73,7 +73,7 @@
             transition: all 0.3s ease;
             opacity: 0.6;
             color: #7f8c8d;
-            white-space: nowrap; /* لمنع نزول النص لسطرين */
+            white-space: nowrap;
         }
 
         .tab-btn:hover {
@@ -104,7 +104,7 @@
             outline: none;
             text-align: center;
             transition: 0.3s;
-            -webkit-appearance: none; /* لتحسين المظهر على iOS */
+            -webkit-appearance: none;
         }
 
         .search-input:focus {
@@ -115,7 +115,6 @@
         /* --- شبكة المحتوى --- */
         .content-grid {
             display: grid;
-            /* تم تعديل minmax ليكون 280 بكسل ليناسب الهواتف */
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
             padding: 20px;
@@ -165,7 +164,7 @@
             text-decoration: none;
             font-weight: bold;
             transition: background 0.3s;
-            margin-top: auto; /* لدفع الزر للأسفل دائماً */
+            margin-top: auto;
         }
 
         .card-btn.vocab-btn { background-color: var(--vocab-color); }
@@ -194,9 +193,7 @@
             margin-top: auto;
         }
 
-        /* =========================================
-           تحسينات التجاوب (Mobile Responsiveness)
-           ========================================= */
+        /* تحسينات التجاوب */
         @media screen and (max-width: 768px) {
             header { padding: 1.5rem 1rem; }
             header h1 { font-size: 1.5rem; }
@@ -209,7 +206,6 @@
             .content-grid {
                 padding: 15px;
                 gap: 15px;
-                /* تقليل عرض العمود ليناسب الهواتف الضيقة */
                 grid-template-columns: 1fr; 
             }
             
@@ -218,7 +214,6 @@
         }
 
         @media screen and (min-width: 480px) and (max-width: 768px) {
-            /* للأجهزة اللوحية الصغيرة والهواتف الكبيرة */
             .content-grid {
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             }
@@ -233,10 +228,10 @@
 
     <div class="tabs-wrapper">
         <div class="tabs-container">
-            <button class="tab-btn vocab" onclick="setTab('vocab')">
+            <button class="tab-btn vocab active" onclick="setTab('vocab')">
                 المفردات اللغوية
             </button>
-            <button class="tab-btn grammar active" onclick="setTab('grammar')">
+            <button class="tab-btn grammar" onclick="setTab('grammar')">
                 القواعد النحوية
             </button>
         </div>
@@ -258,6 +253,14 @@
         const baseUrl = "https://abobakrislamunofficial.github.io/alwafy/";
 
         const lessons = [
+            // --- قسم المفردات ---
+            {
+                title: "مفردات درس معجزة القرآن",
+                category: "vocab",
+                description: "قائمة بأهم المفردات والمصطلحات الواردة في درس معجزة القرآن.",
+                fileName: "mofradaat1.pdf" 
+            },
+
             // --- قسم القواعد ---
             {
                 title: "علامات إعراب الأسماء",
@@ -277,13 +280,10 @@
                 description: "شرح عمل كان وأخواتها عند دخولها على الجملة الاسمية.",
                 fileName: "af3al_nasikha.html"
             }
-            
-            // --- قسم المفردات ---
-            // أضف الدروس هنا مستقبلاً
         ];
 
         // ================= المنطق البرمجي =================
-        let activeTab = 'grammar'; 
+        let activeTab = 'vocab'; // جعلت الافتراضي مفردات لرؤية الإضافة الجديدة
         
         const contentArea = document.getElementById('contentArea');
         const searchInput = document.getElementById('searchInput');
@@ -329,7 +329,7 @@
             filtered.forEach(lesson => {
                 const cardClass = lesson.category === 'vocab' ? 'vocab-card' : 'grammar-card';
                 const btnClass = lesson.category === 'vocab' ? 'vocab-btn' : 'grammar-btn';
-                const btnText = lesson.category === 'vocab' ? 'عرض الدرس' : 'فتح الشرح';
+                const btnText = lesson.category === 'vocab' ? 'عرض الملف' : 'فتح الشرح';
                 const fullLink = baseUrl + lesson.fileName;
 
                 const div = document.createElement('div');
