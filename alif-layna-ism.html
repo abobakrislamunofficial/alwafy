@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الألف اللينة في آخر الأسماء</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e67e22;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --bg-color: #fcfcfc;
+            --text-color: #2c3e50;
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            direction: rtl;
+            text-align: right;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- حاوية العرض --- */
+        #main-container {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- النصوص والعناصر --- */
+        h1 { font-size: 2.2rem; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 15px; margin-bottom: 10px; }
+        h2 { font-size: 1.6rem; color: var(--accent-color); margin-top: 10px; }
+        h3 { font-size: 1.3rem; color: var(--primary-color); margin-top: 5px; border-right: 4px solid var(--accent-color); padding-right: 10px; }
+        
+        p, li { font-size: 1.25rem; line-height: 1.8; margin-bottom: 10px; }
+        ul { list-style-type: none; padding-right: 0; }
+        li { padding: 12px; background: #fff; border: 1px solid #eee; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        strong { color: var(--accent-color); font-weight: 700; }
+
+        .note-box {
+            background-color: #fff8e1;
+            border-right: 5px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .exception-box {
+            background-color: #ffebee;
+            border-right: 5px solid #e57373;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        /* --- الإفصاح التدريجي --- */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .reveal-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* --- الجداول --- */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: var(--border-radius);
+            margin: 15px 0;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            direction: rtl;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+            direction: rtl;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+            font-size: 1.1rem;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) { background-color: #fbfbfb; }
+
+        td.reveal-item { display: table-cell; }
+        td.reveal-item:not(.visible) {
+            color: transparent;
+            background-color: rgba(0,0,0,0.01);
+        }
+
+        /* --- الأسئلة --- */
+        .quiz-question {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            background: #fff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+            direction: rtl;
+        }
+        
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .quiz-option {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--accent-color);
+            background-color: #fffdf9;
+            transform: translateY(-2px);
+        }
+
+        .quiz-option.correct {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            border-color: var(--success-color) !important;
+        }
+
+        .quiz-option.wrong {
+            background-color: var(--error-color) !important;
+            color: white !important;
+            border-color: var(--error-color) !important;
+            opacity: 0.7;
+        }
+
+        .quiz-option.disabled {
+            pointer-events: none;
+        }
+
+        /* --- شريط التحكم --- */
+        .control-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            direction: rtl;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:disabled {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            color: #888;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <div class="slide active">
+            <h1 class="reveal-item visible">كتابة الألف اللينة في آخر الأسماء</h1>
+            <h2 class="reveal-item">تمهيد</h2>
+            <p class="reveal-item">كما في الأفعال، الألف اللينة في الأسماء هي ألف ساكنة مفتوح ما قبلها، وتكتب بطريقتين:</p>
+            <ul>
+                <li class="reveal-item"><strong>ألف قائمة:</strong> ا (مثل: عصا)</li>
+                <li class="reveal-item"><strong>ألف على صورة ياء:</strong> ى (مثل: فتى)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2 class="reveal-item">1️⃣ الأسماء الثلاثية</h2>
+            
+            <h3 class="reveal-item">أ) إذا كان أصل الألف (واو) ← نكتبها (ا)</h3>
+            <ul>
+                <li class="reveal-item">عصـ<strong>ا</strong></li>
+                <li class="reveal-item">عُـلـ<strong>ا</strong></li>
+                <li class="reveal-item">خُطـ<strong>ا</strong></li>
+            </ul>
+
+            <h3 class="reveal-item">ب) إذا كان أصل الألف (ياء) ← نكتبها (ى)</h3>
+            <ul>
+                <li class="reveal-item">فتـ<strong>ـى</strong></li>
+                <li class="reveal-item">هُـد<strong>ى</strong></li>
+                <li class="reveal-item">غِنـ<strong>ـى</strong></li>
+            </ul>
+
+            <div class="reveal-item note-box">
+                <p><strong>💡 كيف تعرف أصل الألف في الاسم؟</strong></p>
+                <p>نأتي بالمثنى:</p>
+                <p>• عصا (مفرد) ← عصـ<strong>و</strong>ان (مثنى) ✅ الأصل واو.</p>
+                <p>• فتى (مفرد) ← فتيـ<strong>ـا</strong>ن (مثنى) ✅ الأصل ياء.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="reveal-item">2️⃣ الأسماء غير الثلاثية</h2>
+            <p class="reveal-item">القاعدة: انظر إلى الحرف الذي <strong>قبل الألف</strong>:</p>
+
+            <h3 class="reveal-item">أ) إذا كان (ياء) ← اكتبها قائمة (ا)</h3>
+            <ul>
+                <li class="reveal-item">قضا<strong>يا</strong></li>
+                <li class="reveal-item">دنـ<strong>يا</strong></li> 
+                <li class="reveal-item">هدا<strong>يا</strong></li>
+            </ul>
+
+            <h3 class="reveal-item">ب) إذا لم يكن (ياء) ← اكتبها على صورة ياء (ى)</h3>
+            <ul>
+                <li class="reveal-item">مصطفـ<strong>ـى</strong></li>
+                <li class="reveal-item">دعـو<strong>ى</strong></li>
+                <li class="reveal-item">مستشفـ<strong>ـى</strong></li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2 class="reveal-item">⚠️ حالة خاصة (تنبيه هام)</h2>
+            <div class="reveal-item exception-box">
+                <p><strong>الاسم "يحيى"</strong></p>
+                <p>رغم أن الألف سبقتها ياء، إلا أننا نكتبها (ى) للتفرقة بينها وبين الفعل.</p>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #e57373;">
+                <p>✅ <strong>يحيى</strong> (الاسم - اسم نبي أو شخص).</p>
+                <p>✅ <strong>يحيا</strong> (الفعل - يعيش).</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="reveal-item">جدول ملخص للقاعدة</h2>
+            <div class="table-container reveal-item">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نوع الاسم</th>
+                            <th>أصل الألف</th>
+                            <th>الكتابة</th>
+                            <th>أمثلة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="reveal-item">ثلاثي</td>
+                            <td class="reveal-item">الأصل واو</td>
+                            <td class="reveal-item" style="font-size:1.5rem; color:var(--accent-color)">ا</td>
+                            <td class="reveal-item">عصا، ربا</td>
+                        </tr>
+                        <tr>
+                            <td class="reveal-item">ثلاثي</td>
+                            <td class="reveal-item">الأصل ياء</td>
+                            <td class="reveal-item" style="font-size:1.5rem; color:var(--accent-color)">ى</td>
+                            <td class="reveal-item">هدى، قرى</td>
+                        </tr>
+                        <tr>
+                            <td class="reveal-item">غير ثلاثي</td>
+                            <td class="reveal-item">قبلها ياء</td>
+                            <td class="reveal-item" style="font-size:1.5rem; color:var(--accent-color)">ا</td>
+                            <td class="reveal-item">قضايا، مرايا</td>
+                        </tr>
+                        <tr>
+                            <td class="reveal-item">غير ثلاثي</td>
+                            <td class="reveal-item">ليس قبلها ياء</td>
+                            <td class="reveal-item" style="font-size:1.5rem; color:var(--accent-color)">ى</td>
+                            <td class="reveal-item">مصطفى، سلوى</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="reveal-item">اختبار قصير</h2>
+            <ul>
+                <li class="reveal-item">طبق القواعد التي تعلمتها للتو.</li>
+                <li class="reveal-item">تذكر أن: في الثلاثي ابحث عن الأصل (واو/ياء).</li>
+                <li class="reveal-item">في غير الثلاثي: انظر للحرف الذي قبل الألف.</li>
+            </ul>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال الأول</h2>
+            <div class="quiz-question reveal-item visible">الاسم "عصا" (المثنى: عصوان). ما هو أصل الألف؟</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, true)">واو</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">ياء</button>
+            </div>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال الثاني</h2>
+            <div class="quiz-question reveal-item visible">الاسم "فتى". الأصل ياء (فتيان). كيف يُكتب؟</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, false)">فتا</button>
+                <button class="quiz-option" onclick="checkAnswer(this, true)">فتى</button>
+            </div>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال الثالث</h2>
+            <div class="quiz-question reveal-item visible">كلمة "قضايا". لماذا كُتبت بالألف القائمة (ا)؟</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, true)">لأنها غير ثلاثية وقبلها ياء</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">لأنها ثلاثية وأصلها واو</button>
+            </div>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال الرابع</h2>
+            <div class="quiz-question reveal-item visible">اختر الكتابة الصحيحة للاسم (مُصطفى/مُصطفا)؟</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, true)">مصطفى</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">مصطفا</button>
+            </div>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال الخامس</h2>
+            <div class="quiz-question reveal-item visible">كيف نميز اسم العلم "يحيى" عن الفعل "يحيا"؟</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, false)">نكتبهما بنفس الشكل</button>
+                <button class="quiz-option" onclick="checkAnswer(this, true)">نكتب الاسم بـ (ى) والفعل بـ (ا)</button>
+            </div>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال السادس</h2>
+            <div class="quiz-question reveal-item visible">من طلب (العُلا) سهر الليالي. لماذا كُتبت "العُلا" بألف قائمة؟</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, true)">اسم ثلاثي أصله واو</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">اسم غير ثلاثي قبله ياء</button>
+            </div>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال السابع</h2>
+            <div class="quiz-question reveal-item visible">أي الكلمات التالية مكتوبة بشكل خاطئ؟</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, true)">سرايى</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">سرايا</button>
+            </div>
+        </div>
+
+        <div class="slide quiz-slide">
+            <h2 class="reveal-item visible">السؤال الثامن</h2>
+            <div class="quiz-question reveal-item visible">كلمة "القرى" (جمع قرية). كُتبت على صورة (ى) لأن:</div>
+            <div class="options-grid reveal-item visible">
+                <button class="quiz-option" onclick="checkAnswer(this, true)">اسم ثلاثي أصله ياء</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">اسم غير ثلاثي لم يسبق بياء</button>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="reveal-item visible">أحسنت</h2>
+            <p class="reveal-item visible">لقد أتقنت قاعدة الألف اللينة في الأسماء.</p>
+            <button class="btn reveal-item visible" onclick="location.reload()">إعادة الدرس</button>
+        </div>
+
+    </div>
+
+    <div class="control-bar">
+        <button class="btn" id="prevBtn" onclick="changeSlide(-1)" disabled>السابق</button>
+        <span class="progress-text" id="progressText"></span>
+        <button class="btn" id="nextBtn" onclick="handleForward()">التالي</button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressText = document.getElementById('progressText');
+        const mainContainer = document.getElementById('main-container');
+
+        // تهيئة أولية
+        updateUI();
+
+        // 1. منطق التنقل
+        function changeSlide(direction) {
+            slides[currentSlideIndex].classList.remove('active');
+            currentSlideIndex += direction;
+            
+            if (currentSlideIndex < 0) currentSlideIndex = 0;
+            if (currentSlideIndex >= slides.length) currentSlideIndex = slides.length - 1;
+
+            slides[currentSlideIndex].classList.add('active');
+            mainContainer.scrollTop = 0; 
+            updateUI();
+        }
+
+        function updateUI() {
+            prevBtn.disabled = currentSlideIndex === 0;
+            nextBtn.disabled = currentSlideIndex === slides.length - 1;
+            progressText.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+        }
+
+        // 2. منطق الإفصاح التدريجي
+        function handleForward() {
+            const currentSlide = slides[currentSlideIndex];
+            const hiddenItems = currentSlide.querySelectorAll('.reveal-item:not(.visible)');
+
+            if (hiddenItems.length > 0) {
+                hiddenItems[0].classList.add('visible');
+                hiddenItems[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                if (currentSlideIndex < slides.length - 1) {
+                    changeSlide(1);
+                }
+            }
+        }
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.closest('.control-bar') || 
+                e.target.closest('button') || 
+                e.target.closest('.quiz-option')) {
+                return;
+            }
+            handleForward();
+        });
+
+        // 3. منطق الاختبار
+        function checkAnswer(btn, isCorrect) {
+            if (window.event) {
+                window.event.stopPropagation();
+            }
+
+            const parentGrid = btn.closest('.options-grid');
+            const allOptions = parentGrid.querySelectorAll('.quiz-option');
+
+            allOptions.forEach(opt => opt.classList.add('disabled'));
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+                allOptions.forEach(opt => {
+                    if (opt.getAttribute('onclick').includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
