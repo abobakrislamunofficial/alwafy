@@ -228,10 +228,10 @@
 
     <div class="tabs-wrapper">
         <div class="tabs-container">
-            <button class="tab-btn vocab active" onclick="setTab('vocab')">
+            <button class="tab-btn vocab" onclick="setTab('vocab')">
                 المفردات اللغوية
             </button>
-            <button class="tab-btn grammar" onclick="setTab('grammar')">
+            <button class="tab-btn grammar active" onclick="setTab('grammar')">
                 القواعد النحوية
             </button>
         </div>
@@ -303,11 +303,24 @@
                 category: "grammar",
                 description: "التعرف على مواضع رسم الألف اللينة في الأسماء العربية والأعجمية والمبنية.",
                 fileName: "alif-layna-ism.html"
+            },
+            // --- الإضافات الجديدة ---
+            {
+                title: "أنواع الخبر",
+                category: "grammar",
+                description: "شرح تفصيلي لأنواع الخبر: المفرد، والجملة (اسمية وفعلية)، وشبه الجملة.",
+                fileName: "anwaa3-alkhabar.pdf"
+            },
+            {
+                title: "تقديم الخبر وجوبا",
+                category: "grammar",
+                description: "شرح الحالات والمواضع التي يجب فيها تقديم الخبر على المبتدأ في الجملة العربية.",
+                fileName: "taqdeem-alkhabar.pdf"
             }
         ];
 
         // ================= المنطق البرمجي =================
-        let activeTab = 'vocab'; // جعلت المفردات هي الافتراضية
+        let activeTab = 'grammar'; // البدء بالقواعد
         
         const contentArea = document.getElementById('contentArea');
         const searchInput = document.getElementById('searchInput');
