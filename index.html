@@ -87,3 +87,316 @@
 
         .tab-btn.grammar.active { opacity: 1; color: white; background-color: var(--grammar-color); }
         .tab-btn.grammar { border-bottom: 5px solid var(--grammar-color); }
+
+        /* --- مربع البحث --- */
+        .search-area {
+            text-align: center;
+            margin: 30px 20px 10px 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+            -webkit-appearance: none;
+        }
+
+        .search-input:focus {
+            border-color: #7f8c8d;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        /* --- شبكة المحتوى --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px;
+            max-width: 1100px;
+            margin: 0 auto 30px auto;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        /* --- البطاقة --- */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            border-top: 6px solid #ccc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover { transform: translateY(-7px); }
+
+        .card.vocab-card { border-top-color: var(--vocab-color); }
+        .card.grammar-card { border-top-color: var(--grammar-color); }
+
+        .card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .card-btn {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-top: auto;
+        }
+
+        .card-btn.vocab-btn { background-color: var(--vocab-color); }
+        .card-btn.vocab-btn:hover { background-color: var(--vocab-hover); }
+
+        .card-btn.grammar-btn { background-color: var(--grammar-color); }
+        .card-btn.grammar-btn:hover { background-color: var(--grammar-hover); }
+
+        .alert-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 10px;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 0.9rem;
+            background-color: #eee;
+            margin-top: auto;
+        }
+
+        /* تحسينات التجاوب */
+        @media screen and (max-width: 768px) {
+            header { padding: 1.5rem 1rem; }
+            header h1 { font-size: 1.5rem; }
+            
+            .tab-btn {
+                padding: 15px 10px;
+                font-size: 1rem;
+            }
+
+            .content-grid {
+                padding: 15px;
+                gap: 15px;
+                grid-template-columns: 1fr; 
+            }
+            
+            .card { padding: 20px; }
+            .search-area { margin-top: 20px; }
+        }
+
+        @media screen and (min-width: 480px) and (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>فهرس محتويات المستوى الخامس</h1>
+    </header>
+
+    <div class="tabs-wrapper">
+        <div class="tabs-container">
+            <button class="tab-btn vocab" onclick="setTab('vocab')">
+                المفردات اللغوية
+            </button>
+            <button class="tab-btn grammar active" onclick="setTab('grammar')">
+                القواعد النحوية
+            </button>
+        </div>
+    </div>
+
+    <div class="search-area">
+        <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن عنوان الدرس...">
+    </div>
+
+    <div class="content-grid" id="contentArea">
+        </div>
+    
+    <footer>
+        <p>جميع الحقوق محفوظة - المستوى الخامس</p>
+    </footer>
+
+    <script>
+        // ================= إعدادات الروابط =================
+        const baseUrl = "https://abobakrislamunofficial.github.io/alwafy/";
+
+        const lessons = [
+            // --- قسم المفردات ---
+            {
+                title: "مفردات درس معجزة القرآن",
+                category: "vocab",
+                description: "قائمة بأهم المفردات والمصطلحات الواردة في درس معجزة القرآن.",
+                fileName: "mofradaat1.pdf" 
+            },
+            {
+                title: "مفردات درس يوم في حياة ناشئ",
+                category: "vocab",
+                description: "مفردات تتعلق بالروتين اليومي للمسلم، آداب الطريق، الصلاة، وممارسة الرياضة.",
+                fileName: "mofradaat2.pdf" 
+            },
+            {
+                title: "مفردات درس أقلياتنا في العالم",
+                category: "vocab",
+                description: "مصطلحات تتعلق بالأقليات المسلمة حول العالم وتوزيعهم الجغرافي.",
+                fileName: "mofradaat3.pdf"
+            },
+
+            // --- قسم القواعد ---
+            {
+                title: "علامات إعراب الأسماء",
+                category: "grammar",
+                description: "عرض تقديمي يشرح العلامات الأصلية والفرعية لرفع ونصب وجر الأسماء.",
+                fileName: "3alamaat_i3rab.html" 
+            },
+            {
+                title: "المبتدأ والخبر",
+                category: "grammar",
+                description: "شرح أركان الجملة الاسمية، أنواع الخبر، والمطابقة بين المبتدأ والخبر.",
+                fileName: "mobtadaa_khabar.html"
+            },
+            {
+                title: "الأفعال الناسخة (كان وأخواتها)",
+                category: "grammar",
+                description: "شرح عمل كان وأخواتها عند دخولها على الجملة الاسمية.",
+                fileName: "af3al_nasikha.html"
+            },
+            {
+                title: "الحروف الناسخة (إن وأخواتها)",
+                category: "grammar",
+                description: "شرح عمل الحروف الناسخة وتأثيرها في نصب المبتدأ ورفع الخبر.",
+                fileName: "7oroof_naasikha.html"
+            },
+            {
+                title: "الألف اللينة آخر الأفعال",
+                category: "grammar",
+                description: "قواعد رسم الألف اللينة (قائمة أو مقصورة) في نهاية الأفعال الثلاثية وغير الثلاثية.",
+                fileName: "alif-layna-fi3l.html"
+            },
+            {
+                title: "الألف اللينة آخر الأسماء",
+                category: "grammar",
+                description: "التعرف على مواضع رسم الألف اللينة في الأسماء العربية والأعجمية والمبنية.",
+                fileName: "alif-layna-ism.html"
+            },
+            {
+                title: "أنواع الخبر",
+                category: "grammar",
+                description: "شرح تفصيلي لأنواع الخبر: المفرد، والجملة (اسمية وفعلية)، وشبه الجملة.",
+                fileName: "anwaa3-alkhabar.pdf"
+            },
+            {
+                title: "تقديم الخبر وجوبا",
+                category: "grammar",
+                description: "شرح الحالات والمواضع التي يجب فيها تقديم الخبر على المبتدأ في الجملة العربية.",
+                fileName: "taqdeem-alkhabar.pdf"
+            },
+            // --- الإضافة الجديدة ---
+            {
+                title: "أدوات الشرط الجازمة",
+                category: "grammar",
+                description: "شرح أدوات الشرط التي تجزم فعلين مضارعين (فعل الشرط وجواب الشرط) وإعرابهما.",
+                fileName: "adawaat-shart-gaazima.pdf"
+            }
+        ];
+
+        // ================= المنطق البرمجي =================
+        let activeTab = 'grammar'; // البدء بالقواعد
+        
+        const contentArea = document.getElementById('contentArea');
+        const searchInput = document.getElementById('searchInput');
+        const btns = document.querySelectorAll('.tab-btn');
+
+        function setTab(category) {
+            activeTab = category;
+            btns.forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.classList.contains(category)) {
+                    btn.classList.add('active');
+                }
+            });
+            searchInput.value = ''; 
+            render();
+        }
+
+        function render() {
+            contentArea.innerHTML = '';
+            const query = searchInput.value.toLowerCase();
+
+            const filtered = lessons.filter(item => {
+                const isSameCategory = item.category === activeTab;
+                const matchesSearch = item.title.toLowerCase().includes(query) || 
+                                      item.description.toLowerCase().includes(query);
+                return isSameCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                const isCategoryEmpty = !lessons.some(l => l.category === activeTab);
+                if (isCategoryEmpty) {
+                    contentArea.innerHTML = `
+                        <div class="alert-msg">
+                            ⏳ لا توجد محتويات في قسم <strong>${activeTab === 'vocab' ? 'المفردات' : 'القواعد'}</strong> حالياً.
+                            <br>سيتم إضافة الدروس قريباً إن شاء الله.
+                        </div>`;
+                } else {
+                    contentArea.innerHTML = '<div class="alert-msg">لا توجد نتائج مطابقة لبحثك.</div>';
+                }
+                return;
+            }
+
+            filtered.forEach(lesson => {
+                const cardClass = lesson.category === 'vocab' ? 'vocab-card' : 'grammar-card';
+                const btnClass = lesson.category === 'vocab' ? 'vocab-btn' : 'grammar-btn';
+                const btnText = lesson.category === 'vocab' ? 'عرض الملف' : 'فتح الشرح';
+                const fullLink = baseUrl + lesson.fileName;
+
+                const div = document.createElement('div');
+                div.className = `card ${cardClass}`;
+                div.innerHTML = `
+                    <h3>${lesson.title}</h3>
+                    <p>${lesson.description}</p>
+                    <a href="${fullLink}" class="card-btn ${btnClass}" target="_blank">
+                        ${btnText}
+                    </a>
+                `;
+                contentArea.appendChild(div);
+            });
+        }
+
+        searchInput.addEventListener('input', render);
+        render();
+
+    </script>
+</body>
+</html>
