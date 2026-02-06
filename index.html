@@ -228,10 +228,10 @@
 
     <div class="tabs-wrapper">
         <div class="tabs-container">
-            <button class="tab-btn vocab" onclick="setTab('vocab')">
+            <button class="tab-btn vocab active" onclick="setTab('vocab')">
                 المفردات اللغوية
             </button>
-            <button class="tab-btn grammar active" onclick="setTab('grammar')">
+            <button class="tab-btn grammar" onclick="setTab('grammar')">
                 القواعد النحوية
             </button>
         </div>
@@ -321,18 +321,11 @@
                 category: "grammar",
                 description: "شرح الحالات والمواضع التي يجب فيها تقديم الخبر على المبتدأ في الجملة العربية.",
                 fileName: "taqdeem-alkhabar.pdf"
-            },
-            // --- الإضافة الجديدة ---
-            {
-                title: "أدوات الشرط الجازمة",
-                category: "grammar",
-                description: "شرح أدوات الشرط التي تجزم فعلين مضارعين (فعل الشرط وجواب الشرط) وإعرابهما.",
-                fileName: "adawaat-shart-gaazima.pdf"
             }
         ];
 
         // ================= المنطق البرمجي =================
-        let activeTab = 'grammar'; // البدء بالقواعد
+        let activeTab = 'vocab'; // البدء بالمفردات
         
         const contentArea = document.getElementById('contentArea');
         const searchInput = document.getElementById('searchInput');
